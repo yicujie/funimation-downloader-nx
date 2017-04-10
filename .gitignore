@@ -1,1 +1,5 @@
+/bin/mkvtoolnix/*
+/bin/mp4box/*
+/bin/streamlink/*
+/bin/tsmuxer/*
 /scripts/node_modules/*

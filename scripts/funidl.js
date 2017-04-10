@@ -16,17 +16,17 @@ const yargs = require('yargs');
 let request = require('request');
 
 // folders
-const configDir = path.join(__dirname,'/config/');
-const configBin = path.join(__dirname,'/base/');
+const configDir  = path.join(__dirname,'/config/');
+const configBase = path.join(__dirname,'/base/');
 let bin, workDir = {};
 
 // check folders
-if(fs.existsSync(configBin)){
-	bin              = require(path.join(configBin,'/config.bin.js'));
-	workDir         = require(path.join(configBin,'/config.dir.js'));
+if(fs.existsSync(configBase)){
+	bin             = require(path.join(configBase,'/config.bin.js'));
+	workDir         = require(path.join(configBase,'/config.dir.js'));
 }
 else{
-	bin              = require(path.join(configDir,'/config.bin.js'));
+	bin             = require(path.join(configDir,'/config.bin.js'));
 	workDir.content = path.join(__dirname,'/../videos/');
 	workDir.trash   = path.join(__dirname,'/../videos/_trash/');
 }
