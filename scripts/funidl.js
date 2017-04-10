@@ -298,6 +298,7 @@ function parseEpsData(epsData){
 		let conOut  = '[s'+ss_snum+'e'+ ss_enum+ ' '+ss_type+'] ';
 			conOut += eps[e].item.titleName + tx_snum + ' - #'+ eps[e].item.episodeNum+ ' ' +eps[e].item.episodeName+ ' ';
 			conOut += '('+rtm_str+') ['+qua_str+aud_str+ ']';
+			conOut += eps[e].item.selected ? ' (selected)' : '';
 		console.log(conOut);
 	}
 	if(selected){
@@ -365,7 +366,7 @@ function parseEpisodeData(epData){
 		getStream(sID);
 	}
 	else{
-		console.log('\nError: Japanese dub not found.\n');
+		console.log('\nError: Dub not selected.\n');
 	}
 }
 
@@ -435,11 +436,9 @@ function downloadStream(url){
 		true
 	);
 	// display sub url (in progress)
-	console.log();
 	if(stDlPath){
-		console.log('Subtitles url:',stDlPath,'\n');
+		console.log('\nSubtitles url:',stDlPath);
 	}
-	console.log();
 	// select muxer
 	if(!argv.mkv){
 		// demux streams
@@ -456,13 +455,13 @@ function downloadStream(url){
 		fs.renameSync(fnOutput+'.track_256.264',fnOutput+'.264');
 		fs.renameSync(fnOutput+'.track_257.aac',fnOutput+'.aac');
 		// mux to mp4
-		let mp4arg  = ' -add "'+fnOutput+'.264#video:name=['+argv.a+']"';
-			mp4arg += ' -add "'+fnOutput+'.aac#audio:lang='+(argv.sub?'jpn':'eng')+':name="';
-			mp4arg += ' -new "'+fnOutput+'.mp4"';
+		let mp4mux  = '-add "'+fnOutput+'.264#video:name=['+argv.a+']" ';
+			mp4mux += '-add "'+fnOutput+'.aac#audio:lang='+(argv.sub?'jpn':'eng')+':name=" ';
+			mp4mux += '-new "'+fnOutput+'.mp4" ';
 		shlp.exec(
 			'mp4box',
 			'"'+path.normalize(bin.mp4box)+'"',
-			mp4arg,
+			mp4mux,
 			true
 		);
 		// cleanup
@@ -472,8 +471,19 @@ function downloadStream(url){
 		fs.renameSync(fnOutput+'.aac', workDir.trash+'/'+fnOutput+'.aac');
 	}
 	else{
-		// mux to mkv (in progress)
+		// mux to mkv
+		let mkvmux  = '-o "'+fnOutput+'.mkv" --disable-track-statistics-tags --engage no_variable_data ';
+			mkvmux += '--track-name "0:['+argv.a+']" --language "1:'+(argv.sub?'jpn':'eng')+'" --video-tracks 0 --audio-tracks 1 --no-subtitles --no-attachments ';
+			mkvmux += '"'+fnOutput+'.ts" ';
+		shlp.exec(
+			'mkvmerge',
+			'"'+path.normalize(bin.mkvmerge)+'"',
+			mkvmux,
+			true
+		);
+		fs.renameSync(fnOutput+'.ts', workDir.trash+'/'+fnOutput+'.ts');
 	}
+	console.log('\nDone!\n');
 }
 
 
