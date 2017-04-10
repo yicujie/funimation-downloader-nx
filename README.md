@@ -1,10 +1,10 @@
 # Funimation Downloader NX
 
-Funimation Downloader NX is capable of downloading video from the Funimation streaming service.
+Funimation Downloader NX is capable of downloading videos from the Funimation streaming service.
 
 ## Legal Warning
 
-This application is not endorsed or affiliated with Funimation. The usage of this application enables video to be downloaded for offline convenience which may be forbidden by law in your country. Usage of this application may also cause a violation of the agreed *Terms of Service* between you and the stream provider. A tool is not responsible for your actions; please make an informed decision prior to using this application.
+This application is not endorsed or affiliated with Funimation. The usage of this application enables videos to be downloaded for offline convenience which may be forbidden by law in your country. Usage of this application may also cause a violation of the agreed *Terms of Service* between you and the stream provider. A tool is not responsible for your actions; please make an informed decision prior to using this application.
 
 ## Prerequisites
 
