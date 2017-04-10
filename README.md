@@ -8,12 +8,12 @@ This application is not endorsed or affiliated with Funimation. The usage of thi
 
 ## Prerequisites
 
-	* NodeJS >= 7.8.0 (https://nodejs.org/)
-	* NPM >= 4.0.0 (https://www.npmjs.org/)
-	* Streamlink >= 0.5.0 (https://github.com/streamlink/streamlink)
-	* MKVToolNix >= 10.0.0 (https://github.com/mbunkus/mkvtoolnix)
-	* tsMuxeR >= 2.6.12 (https://www.videohelp.com/software/tsMuxeR)
-	* MP4Box >= 0.6.0 (https://github.com/gpac/gpac)
+* NodeJS >= 7.8.0 (https://nodejs.org/)
+* NPM >= 4.0.0 (https://www.npmjs.org/)
+* Streamlink >= 0.5.0 (https://github.com/streamlink/streamlink)
+* MKVToolNix >= 10.0.0 (https://github.com/mbunkus/mkvtoolnix)
+* tsMuxeR >= 2.6.12 (https://www.videohelp.com/software/tsMuxeR)
+* MP4Box >= 0.6.0 (https://github.com/gpac/gpac)
 
 ## Switches
 
