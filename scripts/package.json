@@ -1,0 +1,29 @@
+{
+	"name": "funimation-downloader-nx",
+	"version": "2.1.0",
+	"description": "Download video from Funimation via cli.",
+	"keywords": [
+		"download",
+		"downloader",
+		"funimation",
+		"funimationnow",
+		"util",
+		"utility"
+	],
+	"author": "Seiya Loveless",
+	"homepage": "https://github.com/seiya-dev/funimation-downloader-nx",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/seiya-dev/funimation-downloader-nx.git"
+	},
+	"bugs": {
+		"url": "https://github.com/seiya-dev/funimation-downloader-nx/issues"
+	},
+	"license": "MIT",
+	"main": "funidl.js",
+	"dependencies": {
+		"request": "^2.53.0",
+		"sei-helper": "^1.1.0",
+		"yargs": "^3.18.0"
+	}
+}
