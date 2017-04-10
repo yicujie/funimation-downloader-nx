@@ -1,4 +1,4 @@
-const binDir = __dirname+'/../bin'
+const binDir = __dirname+'/../../bin'
 
 module.exports = {
 	mkvtoolnix: binDir+'/mkvtoolnix/mkvmerge',

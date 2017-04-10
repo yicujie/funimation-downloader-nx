@@ -3,3 +3,8 @@
 /bin/streamlink/*
 /bin/tsmuxer/*
 /scripts/node_modules/*
+*.ts
+*.mkv
+*.mp4
+*.264
+*.aac
