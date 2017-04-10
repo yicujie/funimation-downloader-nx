@@ -467,6 +467,7 @@ function downloadStream(url){
 		);
 		// cleanup
 		fs.unlinkSync(fnOutput+'.meta');
+		fs.renameSync(fnOutput+'.ts', workDir.trash+'/'+fnOutput+'.ts');
 		fs.renameSync(fnOutput+'.264', workDir.trash+'/'+fnOutput+'.264');
 		fs.renameSync(fnOutput+'.aac', workDir.trash+'/'+fnOutput+'.aac');
 	}
