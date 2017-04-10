@@ -3,6 +3,7 @@
 /bin/streamlink/*
 /bin/tsmuxer/*
 /scripts/node_modules/*
+funi_auth.json
 *.ts
 *.mkv
 *.mp4
