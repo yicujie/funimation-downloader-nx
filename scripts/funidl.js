@@ -159,7 +159,7 @@ function parseAuth(authData){
 	authData = JSON.parse(authData);
 	if(authData.token){
 		console.log('Auth success, your token:',authData.token.slice(0,7)+'*'.repeat(33),'\n');
-		fs.writeFileSync(cfg_filename,JSON.stringify({"token":authData.token},null,'\t'));
+		fs.writeFileSync(cfgFilename,JSON.stringify({"token":authData.token},null,'\t'));
 	}
 	else{
 		console.log('Error:',authData.error,'\n');
