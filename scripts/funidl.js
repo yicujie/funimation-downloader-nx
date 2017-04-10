@@ -1,5 +1,5 @@
 // package json
-const packageJson = require('package.json');
+const packageJson = require('./package.json');
 
 // program name
 console.log('\n=== Funimation Downloader NX '+packageJson.version+' ===\n');
