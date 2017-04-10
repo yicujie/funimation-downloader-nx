@@ -6,8 +6,7 @@ console.log('\n=== Funimation Downloader NX '+packageJson.version+' ===\n');
 const api_host = 'https://prod-api-funimationnow.dadcdigital.com';
 
 // modules build-in
-const querystring = require('querystring');
-const chdir = require('process').chdir;
+const { chdir } = require('process');
 const path = require('path');
 const fs = require('fs');
 
@@ -303,6 +302,9 @@ function parseEpsData(epsData){
 	}
 	if(selected){
 		getEpisodeData(selected_data);
+	}
+	else{
+		console.log();
 	}
 }
 
