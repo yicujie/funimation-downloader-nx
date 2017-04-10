@@ -1,7 +1,7 @@
 {
 	"name": "funimation-downloader-nx",
 	"version": "2.1.0",
-	"description": "Download video from Funimation via cli.",
+	"description": "Download videos from Funimation via cli.",
 	"keywords": [
 		"download",
 		"downloader",

@@ -71,7 +71,7 @@ let argv = yargs
 	
 	.describe('t','Filename: series title override')
 	.describe('ep','Filename: episode number override')
-	.describe('suffix','Filename: filename suffix override (first SIZEp will be raplaced with actual video size).')
+	.describe('suffix','Filename: filename suffix override (first "SIZEp" will be raplaced with actual video size).')
 	.default('suffix','SIZEp')
 	
 	.describe('mkv','mux into mkv')
