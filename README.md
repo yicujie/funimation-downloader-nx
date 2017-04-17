@@ -22,6 +22,7 @@ By default this application uses the following paths to programs (main executabl
 * `./bin/tsMuxeR/tsMuxeR`
 * `./bin/mp4box/mp4box`
 * `./bin/mkvtoolnix/mkvmerge`
+
 To change these paths you need to edit `config.bin.js` in `./scripts/config/` directory.
 
 ### Node Modules
