@@ -75,7 +75,7 @@ let argv = yargs
 	
 	.describe('mkv','Mux into mkv')
 	.boolean('mkv')
-	.describe('mks','Add subs to mkv (if available)')
+	.describe('mks','Add subtitles to mkv (if available)')
 	.boolean('mks')
 	
 	// login
