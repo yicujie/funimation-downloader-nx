@@ -51,7 +51,7 @@ After installing NodeJS with NPM goto `scripts` directory and type: `npm i`
 
 ### Muxing
 
-`[note]` this application mux into mp4 by default
+`[note] this application mux into mp4 by default`
 * `--mkv` mux into mkv
 * `--mks` add subtitles to mkv (if available)
 
