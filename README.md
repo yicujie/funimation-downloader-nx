@@ -42,6 +42,7 @@ After installing NodeJS with NPM goto `scripts` directory and type: `npm i`
 ### Download Video
 
 * `-s <i> --sel <i>` sets the show id and episode number
+* `--ss <i>` sets the season number (1 by default)
 * `--cat <s>` episode category [episode/movie/ova/commentary] (optional, "episode" by default)
 * `--sub` switch from English dub to Japanese dub with subtitles
 * `--proxy <s>` set ipv4 http(s) proxy for all requests to funimation api
