@@ -17,7 +17,7 @@ This application is not endorsed by or affiliated with *Funimation*. This applic
 
 ### Paths Configuration
 
-By default this application uses these paths to programs (main executables):
+By default this application uses the following paths to programs (main executables):
 * `./bin/streamlink/build/streamlink`
 * `./bin/tsMuxeR/tsMuxeR`
 * `./bin/mp4box/mp4box`
