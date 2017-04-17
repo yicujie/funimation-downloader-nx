@@ -55,29 +55,29 @@ let argv = yargs
 	.describe('sub','Sub mode (Dub mode by default)')
 	.boolean('sub')
 	
-	.describe('q','Video quality.')
+	.describe('q','Video quality')
 	.choices('q', ['234p','270p','288p','360p','480p','540p','720p','1080p'])
 	.default('q','720p')
 	
 	.describe('a','Release group')
 	.default('a','Funimation')
 	
+	.describe('sel','Select episode')
 	.describe('ss','Select season')
 	.default('ss','1')
 	.describe('cat','Select category [episode/movie/ova]')
 	.default('cat','episode')
-	.describe('sel','Select episode')
 	
 	.describe('t','Filename: series title override')
 	.describe('ep','Filename: episode number override')
-	.describe('suffix','Filename: filename suffix override (first "SIZEp" will be raplaced with actual video size).')
+	.describe('suffix','Filename: filename suffix override (first "SIZEp" will be raplaced with actual video size)')
 	.default('suffix','SIZEp')
 	
-	.describe('mkv','mux into mkv')
+	.describe('mkv','Mux into mkv')
 	.boolean('mkv')
 	
-	.describe('mws','add subs to mkv (if available)')
-	.boolean('mws')
+	.describe('mks','Add subs to mkv (if available)')
+	.boolean('mks')
 	
 	// login
 	.describe('mail','Your email')
@@ -146,7 +146,6 @@ function doAuth(){
 	};
 	request.post(options, (err, mes, body) => {
 		if (err) return err;
-		if (mes) {}
 		if(body.match(/<html/)){
 			console.log('Unknown error.\n');
 		}
@@ -183,7 +182,6 @@ function searchAnime(){
 	}
 	request.get(options, (err, mes, body) => {
 		if (err) return err;
-		if (mes) {}
 		if(body.match(/<html/)){
 			console.log('Unknown error.\n');
 		}
@@ -215,7 +213,6 @@ function getShowData(){
 	}
 	request.get(options, (err, mes, body) => {
 		if (err) return err;
-		if (mes) {}
 		if(body.match(/<!doctype html>/)){
 			console.log('Title not avaible in your region(?).\n');
 		}
@@ -261,7 +258,6 @@ function getEpsData(){
 	}
 	request.get(options, (err, mes, body) => {
 		if (err) return err;
-		if (mes) {}
 		if(body.match(/<!doctype html>/)){
 			console.log('Title not avaible in your region(?).\n');
 		}
@@ -278,7 +274,14 @@ function parseEpsData(epsData){
 	let episode_data = [];
 	let selected = false, selected_data = {};
 	for(let e in eps){
-		if(eps[e].item.seasonNum == argv.ss && eps[e].item.episodeNum == argv.sel && eps[e].mediaCategory == argv.cat){
+		// fix ep num
+		let epExtra = false;
+		if(eps[e].item.episodeNum===''){
+			epExtra = true;
+			eps[e].item.episodeNum = eps[e].item.episodeId;
+		}
+		// select
+		if(eps[e].item.seasonNum == argv.ss &&  eps[e].item.episodeNum == argv.sel && eps[e].mediaCategory == argv.cat){
 			selected = true;
 			selected_data = {title:eps[e].item.titleSlug,episode:eps[e].item.episodeSlug};
 			eps[e].item.selected = true;
@@ -287,15 +290,15 @@ function parseEpsData(epsData){
 			eps[e].item.selected = false;
 		}
 		// console vars
-		let ss_snum = eps[e].item.seasonNum > 9 ? eps[e].item.seasonNum : '0'+eps[e].item.seasonNum;
-		let ss_enum = eps[e].item.episodeNum > 9 ? eps[e].item.episodeNum : '0'+eps[e].item.episodeNum;
+		let ss_snum = eps[e].item.seasonNum  < 10 ? '0'+eps[e].item.seasonNum : eps[e].item.seasonNum;
+		let ss_enum = eps[e].item.episodeNum < 10 ? '0'+eps[e].item.episodeNum : eps[e].item.episodeNum;
 		let ss_type = eps[e].mediaCategory;
 		let tx_snum = eps[e].item.seasonNum==1?'':' S'+eps[e].item.seasonNum;
 		let qua_str = eps[e].quality.height ? eps[e].quality.quality +''+ eps[e].quality.height : 'UNK';
 		let aud_str = eps[e].audio.length > 0 ? ', '+eps[e].audio.join(', ') : '';
 		let rtm_str = eps[e].item.runtime !== '' ? eps[e].item.runtime : '??:??';
 		// console string
-		let conOut  = '[s'+ss_snum+'e'+ ss_enum+ ' '+ss_type+'] ';
+		let conOut  = '[s'+ss_snum+(epExtra?'x':'e')+ss_enum + ' '+ss_type+'] ';
 			conOut += eps[e].item.titleName + tx_snum + ' - #'+ eps[e].item.episodeNum+ ' ' +eps[e].item.episodeName+ ' ';
 			conOut += '('+rtm_str+') ['+qua_str+aud_str+ ']';
 			conOut += eps[e].item.selected ? ' (selected)' : '';
@@ -321,7 +324,6 @@ function getEpisodeData(fnSlug){
 	}
 	request.get(options, (err, mes, body) => {
 		if (err) return err;
-		if (mes) {}
 		if(body.match(/<html/)){
 			console.log('\nUnknown error.\n');
 		}
@@ -337,7 +339,7 @@ function parseEpisodeData(epData){
 	fnTitle = argv.t ? argv.t : ep.parent.title;
 	ep.number = isNaN(ep.number) ? ep.number : ( parseInt(ep.number, 10) < 10 ? '0' + ep.number : ep.number );
 	if(ep.mediaCategory != 'Episode'){
-		ep.number = ep.mediaCategory+ep.number;
+		ep.number = ep.number !== '' ? ep.mediaCategory+ep.number : ep.mediaCategory+' (id'+ep.id+')';
 	}
 	fnEpNum = argv.ep ? ( parseInt(argv.ep, 10) < 10 ? '0' + argv.ep : argv.ep ).replace('_','') : ep.number;
 	fnSuffix = argv.suffix.replace('SIZEp',argv.q);
@@ -394,7 +396,6 @@ function getStream(sID){
 	}
 	request.get(options, (err, mes, body) => {
 		if (err) return err;
-		if (mes) {}
 		if(body.match(/<html/)){
 			console.log('Unknown error.\n');
 		}
@@ -429,61 +430,49 @@ function downloadStream(url){
 	// to work dir
 	chdir(workDir.content);
 	// download video
-	shlp.exec(
-		'streamlink',
-		'"'+path.normalize(bin.streamlink)+'"',
-		'"hlsvariant://'+url+'" '+argv.q+' --hls-segment-attempts 10 --hls-segment-threads 10 --hls-segment-timeout 60 -o "'+fnOutput+'.ts"',
-		true
-	);
+	let speedupSegments = '--hls-segment-attempts 10 --hls-segment-threads 10 --hls-segment-timeout 60';
+	shlp.exec('streamlink','"'+path.normalize(bin.streamlink)+'"','"hlsvariant://'+url+'" '+argv.q+' '+speedupSegments+' -o "'+fnOutput+'.ts"',true);
 	// display sub url (in progress)
 	if(stDlPath){
 		console.log('\nSubtitles url:',stDlPath);
+		// download subtitles
 	}
 	// select muxer
-	if(!argv.mkv){
+	if(argv.mkv){
+		// mux to mkv
+		let mkvmux  = '-o "'+fnOutput+'.mkv" --disable-track-statistics-tags --engage no_variable_data ';
+			mkvmux += '--track-name "0:['+argv.a+']" --language "1:'+(argv.sub?'jpn':'eng')+'" --video-tracks 0 --audio-tracks 1 --no-subtitles --no-attachments ';
+			if(mks&&stDlPath){
+				// add mux options for subtitles (in progress)
+			}
+			mkvmux += '"'+fnOutput+'.ts" ';
+		shlp.exec('mkvmerge','"'+path.normalize(bin.mkvmerge)+'"',mkvmux,true);
+		fs.renameSync(fnOutput+'.ts', workDir.trash+'/'+fnOutput+'.ts');
+	}
+	else{
+		// Get stream data
+		let metaData = require('child_process').execSync('"'+path.normalize(bin.tsmuxer)+'" "'+fnOutput+'.ts"');
+		let metaDataRe = /Track ID:\s*(\d+)[\s\S]*?Stream ID:\s*([\S]*)[\s\S]*?Frame rate:\s*([\S]*)[\s\S]*?Track ID:\s*(\d+)[\s\S]*?Stream ID:\s*([\S]*)[\s\S]*?Stream delay:\s*([\S]*)/;
+		let metaArgs = metaData.toString().match(metaDataRe);
 		// demux streams
 		let ts2meta  = 'MUXOPT --no-pcr-on-video-pid --new-audio-pes --demux --vbr  --vbv-len=500\n';
-			ts2meta += 'V_MPEG4/ISO/AVC, "'+workDir.content+'/'+fnOutput+'.ts", insertSEI, contSPS, track=256\n';
-			ts2meta += 'A_AAC, "'+workDir.content+'/'+fnOutput+'.ts", track=257';
+			ts2meta += metaArgs[2]+', "'+path.normalize(workDir.content+'/'+fnOutput+'.ts')+'", insertSEI, contSPS, track='+metaArgs[1]+'\n';
+			ts2meta += metaArgs[5]+', "'+path.normalize(workDir.content+'/'+fnOutput+'.ts')+'", timeshift='+metaArgs[6]+'ms, track='+metaArgs[4];
 		fs.writeFileSync(fnOutput+'.meta',ts2meta);
-		shlp.exec(
-			'tsmuxer',
-			'"'+path.normalize(bin.tsmuxer)+'"',
-			'"'+fnOutput+'.meta" "'+workDir.content+'"',
-			true
-		);
-		fs.renameSync(fnOutput+'.track_256.264',fnOutput+'.264');
-		fs.renameSync(fnOutput+'.track_257.aac',fnOutput+'.aac');
+		shlp.exec('tsmuxer','"'+path.normalize(bin.tsmuxer)+'"','"'+fnOutput+'.meta" "'+path.normalize(workDir.content)+'"',true);
+		fs.renameSync(fnOutput+'.track_'+metaArgs[1]+'.264',fnOutput+'.264');
+		fs.renameSync(fnOutput+'.track_'+metaArgs[4]+'.aac',fnOutput+'.aac');
 		// mux to mp4
 		let mp4mux  = '-add "'+fnOutput+'.264#video:name=['+argv.a+']" ';
 			mp4mux += '-add "'+fnOutput+'.aac#audio:lang='+(argv.sub?'jpn':'eng')+':name=" ';
 			mp4mux += '-new "'+fnOutput+'.mp4" ';
-		shlp.exec(
-			'mp4box',
-			'"'+path.normalize(bin.mp4box)+'"',
-			mp4mux,
-			true
-		);
+		shlp.exec('mp4box','"'+path.normalize(bin.mp4box)+'"',mp4mux,true);
 		// cleanup
 		fs.unlinkSync(fnOutput+'.meta');
 		fs.renameSync(fnOutput+'.ts', workDir.trash+'/'+fnOutput+'.ts');
 		fs.renameSync(fnOutput+'.264', workDir.trash+'/'+fnOutput+'.264');
 		fs.renameSync(fnOutput+'.aac', workDir.trash+'/'+fnOutput+'.aac');
 	}
-	else{
-		// mux to mkv
-		let mkvmux  = '-o "'+fnOutput+'.mkv" --disable-track-statistics-tags --engage no_variable_data ';
-			mkvmux += '--track-name "0:['+argv.a+']" --language "1:'+(argv.sub?'jpn':'eng')+'" --video-tracks 0 --audio-tracks 1 --no-subtitles --no-attachments ';
-			mkvmux += '"'+fnOutput+'.ts" ';
-		shlp.exec(
-			'mkvmerge',
-			'"'+path.normalize(bin.mkvmerge)+'"',
-			mkvmux,
-			true
-		);
-		fs.renameSync(fnOutput+'.ts', workDir.trash+'/'+fnOutput+'.ts');
-	}
 	console.log('\nDone!\n');
 }
-
 
