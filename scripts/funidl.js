@@ -49,10 +49,17 @@ let argv = yargs
 	
 	// params
 	.describe('s','Set show id')
-	.describe('alt','alternative episode listing (if available)')
+	.describe('alt','Alternative episode listing (if available)')
 	.boolean('alt')
 	
-	.describe('sub','Sub mode (Dub mode by default)')
+	.describe('sel','Select episode')
+	.describe('ss','Select season')
+	.default('ss','1')
+	.describe('cat','Select category')
+	.choices('cat', ['episode','movie','ova','commentary'])
+	.default('cat','episode')
+	
+	.describe('sub','Subtitles mode (Dub mode by default)')
 	.boolean('sub')
 	
 	.describe('q','Video quality')
@@ -61,13 +68,6 @@ let argv = yargs
 	
 	.describe('a','Release group')
 	.default('a','Funimation')
-	
-	.describe('sel','Select episode')
-	.describe('ss','Select season')
-	.default('ss','1')
-	.describe('cat','Select category [episode/movie/ova]')
-	.default('cat','episode')
-	
 	.describe('t','Filename: series title override')
 	.describe('ep','Filename: episode number override')
 	.describe('suffix','Filename: filename suffix override (first "SIZEp" will be raplaced with actual video size)')
@@ -75,7 +75,6 @@ let argv = yargs
 	
 	.describe('mkv','Mux into mkv')
 	.boolean('mkv')
-	
 	.describe('mks','Add subs to mkv (if available)')
 	.boolean('mks')
 	

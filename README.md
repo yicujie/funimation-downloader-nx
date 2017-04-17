@@ -43,17 +43,25 @@ After installing NodeJS with NPM goto `scripts` directory and type: `npm i`
 
 * `-s <i> --sel <i>` sets the show id and episode number
 * `--ss <i>` sets the season number (optional, "1" by default)
-* `--cat <s>` sets the episode category [episode/movie/ova/commentary] (optional, "episode" by default)
+* `--cat <s>` sets the video category (optional, "episode" by default)
+* `--alt` alternative episode listing (if available)
+* `-q <i>p` sets the video quality (optional, "720p" by default)
 * `--sub` switch from English dub to Japanese dub with subtitles
 * `--proxy <s>` set ipv4 http(s) proxy for all requests to funimation api
 
 ### Muxing
 
-* `--mkv` mux into mkv (by default it uses mp4 muxer)
+`[note]` this application mux into mp4 by default
+* `--mkv` mux into mkv
 * `--mks` add subtitles to mkv (if available)
 
 ### Filenaming Options (optional)
 
+* `-a <s>` release group ("Funimation" by default)
 * `-t <s>` series title override
 * `--ep <s>` episode number override
 * `--suffix <s>` filename suffix override (first "SIZEp" will be replaced with actual video size, "SIZEp" by default)
+
+### Filename Template
+
+[`release group`] `title` - `episode` [`suffix`].`extension` 
