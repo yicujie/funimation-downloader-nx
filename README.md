@@ -41,9 +41,7 @@ After installing NodeJS with NPM goto `scripts` directory and type: `npm i`
 
 ### Download Video
 
-* `-s <i> --sel <i>` sets the show id and episode number
-* `--ss <i>` sets the season number (optional, "1" by default)
-* `--cat <s>` sets the video category (optional, "episode" by default)
+* `-s <i> --sel <s>` sets the show id and episode id
 * `--alt` alternative episode listing (if available)
 * `-q <i>p` sets the video quality (optional, "720p" by default)
 * `--sub` switch from English dub to Japanese dub with subtitles
@@ -58,7 +56,7 @@ After installing NodeJS with NPM goto `scripts` directory and type: `npm i`
 ### Filenaming Options (optional)
 
 * `-a <s>` release group ("Funimation" by default)
-* `-t <s>` series title override
+* `-t <s>` show title override
 * `--ep <s>` episode number override
 * `--suffix <s>` filename suffix override (first "SIZEp" will be replaced with actual video size, "SIZEp" by default)
 
