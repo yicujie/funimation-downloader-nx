@@ -128,44 +128,47 @@ else{
 }
 
 async function auth(){
+	let authData;
 	try{
-		let authData = await getData(api_host+'/auth/login/',false,true,false,true);
-		authData = JSON.parse(authData);
-		if(authData.token){
-			console.log('[INFO] Authentication success, your token:',authData.token.slice(0,7)+'*'.repeat(33),'\n');
-			fs.writeFileSync(cfgFilename,JSON.stringify({"token":authData.token},null,'\t'));
-		}
-		else{
-			console.log('[ERROR]',authData.error,'\n');
-			process.exit(1);
-		}
+		authData = await getData(api_host+'/auth/login/',false,true,false,true);
+		checkResp(authData);
 	}
 	catch(error){
-		console.log(error);
+		console.log(error,'\n');
+		process.exit(1);
+	}
+	authData = JSON.parse(authData);
+	if(authData.token){
+		console.log('[INFO] Authentication success, your token:',authData.token.slice(0,7)+'*'.repeat(33),'\n');
+		fs.writeFileSync(cfgFilename,JSON.stringify({"token":authData.token},null,'\t'));
+	}
+	else{
+		console.log('[ERROR]',authData.error,'\n');
 		process.exit(1);
 	}
 }
 
 async function searchShow(){
+	let searchData;
 	try{
 		let qs = {unique:true,limit:100,q:argv.search,offset:(argv.p-1)*1000};
-		let searchData = await getData(api_host+'/source/funimation/search/auto/',qs,true,true);
-		if(searchData.match(/<!doctype html>/) || searchData.match(/<html/)){
-			console.log('[ERROR] Unknown error\n');
-		}
-		searchData = JSON.parse(searchData);
-		if(searchData.items.hits){
-			let shows = searchData.items.hits;
-			for(let ssn in shows){
-				console.log('[#'+shows[ssn].id+'] '+shows[ssn].title+(shows[ssn].tx_date?' ('+shows[ssn].tx_date+')':''));
-			}
-		}
-		console.log('[INFO] Total shows found:',searchData.count,'\n');
+		searchData = await getData(api_host+'/source/funimation/search/auto/',qs,true,true);
+		checkResp(searchData);
 	}
 	catch(error){
-		console.log(error);
+		console.log(error,'\n');
 		process.exit(1);
 	}
+	
+	searchData = JSON.parse(searchData);
+	if(searchData.items.hits){
+		let shows = searchData.items.hits;
+		console.log('[INFO] Search Results:');
+		for(let ssn in shows){
+			console.log('[#'+shows[ssn].id+'] '+shows[ssn].title+(shows[ssn].tx_date?' ('+shows[ssn].tx_date+')':''));
+		}
+	}
+	console.log('[INFO] Total shows found:',searchData.count,'\n');
 }
 
 async function getShow(){
@@ -173,25 +176,20 @@ async function getShow(){
 	let showData;
 	try{
 		showData = await getData(api_host+'/source/catalog/title/'+parseInt(argv.s,10),false,true,true);
-		if(showData.match(/<!doctype html>/) || showData.match(/<html/)){
-			console.log('[ERROR] Show not available in your region or unknown error\n');
-			process.exit(1);
-		}
-		showData = JSON.parse(showData);
-		if(showData.status){
-			console.log('[ERROR] Error #'+showData.status+':',showData.data.errors[0].detail,'\n');
-			process.exit(1);
-		}
-		else if(!showData.items){
-			console.log('[ERROR] Unknown error\n');
-		}
-		else if(showData.items.length<1){
-			console.log('[ERROR] Show not found\n');
-		}
+		checkResp(showData);
 	}
 	catch(error){
-		console.log(error);
+		console.log(error,'\n');
 		process.exit(1);
+	}
+	// check errors
+	showData = JSON.parse(showData);
+	if(showData.status){
+		console.log('[ERROR] Error #'+showData.status+':',showData.data.errors[0].detail,'\n');
+		process.exit(1);
+	}
+	else if(!showData.items || showData.items.length<1){
+		console.log('[ERROR] Show not found\n');
 	}
 	showData = showData.items[0];
 	console.log('[#'+showData.id+'] '+showData.title+' ('+showData.releaseYear+')');
@@ -201,26 +199,20 @@ async function getShow(){
 		let qs = {limit:-1,sort:'order',sort_direction:'ASC',title_id:parseInt(argv.s,10)};
 		if(argv.alt){ qs.language = 'English'; }
 		episodesData = await getData(api_host+'/funimation/episodes/',qs,true,true);
-		if(episodesData.match(/<!doctype html>/) || episodesData.match(/<html/)){
-			console.log('[ERROR] Unknown error\n');
-			process.exit(1);
-		}
-		episodesData = JSON.parse(episodesData).items;
+		checkResp(episodesData);
 	}
 	catch(error){
-		console.log(error);
+		console.log(error,'\n');
 		process.exit(1);
 	}
 	// parse episodes list
-	let eps = episodesData,
-		selected = false,
-		fnSlug = {};
+	let eps = JSON.parse(episodesData).items,
+		fnSlug = false;
 	for(let e in eps){
 		let showStrId = eps[e].ids.externalShowId;
 		let epStrId = eps[e].ids.externalEpisodeId.replace(new RegExp('^'+showStrId),'');
 		// select
 		if(epStrId == argv.sel){
-			selected = true;
 			fnSlug = {title:eps[e].item.titleSlug,episode:eps[e].item.episodeSlug};
 		}
 		// console vars
@@ -236,32 +228,28 @@ async function getShow(){
 			conOut += eps[e].item.titleName+tx_snum + ' - ' +tx_type+tx_enum+ ' ' +eps[e].item.episodeName+ ' ';
 			conOut += '('+rtm_str+') ['+qua_str+aud_str+ ']';
 			conOut += epStrId == argv.sel ? ' (selected)' : '';
+			conOut += eps.length-1 == e ? '\n' : '';
 		console.log(conOut);
 	}
-	if(!selected){
-		console.log();
+	if(!fnSlug){
 		process.exit();
 	}
 	// parse episode data
 	let episodeData;
 	try{
 		episodeData = await getData(api_host+'/source/catalog/episode/'+fnSlug.title+'/'+fnSlug.episode+'/',false,true,true);
-		if(episodeData.match(/<!doctype html>/) || episodeData.match(/<html/)){
-			console.log('\n[ERROR] Unknown error\n');
-			process.exit(1);
-		}
-		episodeData = JSON.parse(episodeData).items;
+		checkResp(episodeData);
 	}
 	catch(error){
-		console.log(error);
+		console.log(error,'\n');
 		process.exit(1);
 	}
-	let ep = episodeData[0], streamId = 0;
+	let ep = JSON.parse(episodeData).items[0], streamId = 0;
 	// build fn
 	fnTitle = argv.t ? argv.t : ep.parent.title;
 	ep.number = isNaN(ep.number) ? ep.number : ( parseInt(ep.number, 10) < 10 ? '0' + ep.number : ep.number );
 	if(ep.mediaCategory != 'Episode'){
-		ep.number = ep.number !== '' ? ep.mediaCategory+ep.number : ep.mediaCategory+' (id'+ep.id+')';
+		ep.number = ep.number !== '' ? ep.mediaCategory+ep.number : ep.mediaCategory+'#'+ep.id;
 	}
 	fnEpNum = argv.ep ? ( parseInt(argv.ep, 10) < 10 ? '0' + argv.ep : argv.ep ) : ep.number;
 	fnSuffix = argv.suffix.replace('SIZEp',argv.q);
@@ -269,19 +257,19 @@ async function getShow(){
 	// end
 	console.log('[INFO] Output filename: '+fnOutput,'\n\n[INFO] Available audio tracks:');
 	for(let m in ep.media){
-		selected = false;
+		let selected = false;
 		if(ep.media[m].mediaType=='experience'){
 			let media_id = ep.media[m].id;
 			let dub_type = ep.media[m].title.split('_')[1];
 			if(dub_type == 'Japanese' && argv.sub){
 				streamId = ep.media[m].id;
-				selected = true;
 				stDlPath = getSubsUrl(ep.media[m].mediaChildren);
+				selected = true;
 			}
 			else if(dub_type == 'English' && !argv.sub){
 				streamId = ep.media[m].id;
-				selected = true;
 				stDlPath = getSubsUrl(ep.media[m].mediaChildren);
+				selected = true;
 			}
 			console.log('[#'+media_id+'] '+dub_type+(selected?' (selected)':''));
 		}
@@ -294,16 +282,13 @@ async function getShow(){
 	let streamData;
 	try{
 		streamData = await getData(api_host+'/source/catalog/video/'+streamId+'/signed',false,true,true);
-		if(streamData.match(/<!doctype html>/) || streamData.match(/<html/)){
-			console.log('\n[ERROR] Unknown error\n');
-			process.exit(1);
-		}
-		streamData = JSON.parse(streamData);
+		checkResp(streamData);
 	}
 	catch(error){
-		console.log(error);
+		console.log(error,'\n');
 		process.exit(1);
 	}
+	streamData = JSON.parse(streamData);
 	if(streamData.errors){
 		console.log('\n[ERROR] Error #'+streamData.errors[0].code+':',streamData.errors[0].detail,'\n');
 		process.exit(1);
@@ -329,7 +314,6 @@ function getSubsUrl(m){
 		let fpe = fpp[fpp.length-1];
 		if(fpe == 'vtt'){
 			return m[i].filePath;
-			break;
 		}
 	}
 	return false;
@@ -393,6 +377,14 @@ async function downloadStreams(){
 	console.log('\n[INFO] Done!\n');
 }
 
+// check response
+function checkResp(r){
+	if(r.match(/<!doctype html>/) || r.match(/<html/)){
+		console.log('[ERROR] unknown error, body:\n',r,'\n');
+		process.exit(1);
+	}
+}
+
 // get data fro url
 function getData(url,qs,proxy,useToken,auth){
 	let options = {};
@@ -417,21 +409,12 @@ function getData(url,qs,proxy,useToken,auth){
 		options.proxy = 'http://'+argv.proxy;
 		options.timeout = 10000;
 	}
-	// debug
-	if(argv.debug){
-		console.log('\n[DEBUG] Request parameters:');
-		console.log(options,'\n');
-	}
 	// do request
 	return new Promise((resolve, reject) => {
 		request(options, (err, resp, body) => {
 			if (err) return reject(err);
-			if (resp.statusCode != 200) {
-				return reject(new Error(`Status: ${resp.statusCode}`));
-			}
-			if(argv.debug){
-				console.log('\n[DEBUG] Body response:');
-				console.log(body,'\n');
+			if (resp.statusCode != 200 && resp.statusCode != 403) {
+				return reject(new Error(`\nStatus: ${resp.statusCode}`));
 			}
 			resolve(body);
 		});
