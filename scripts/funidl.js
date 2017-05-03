@@ -128,24 +128,32 @@ else{
 }
 
 async function auth(){
+	try {
+		let token = await funimationAuth(argv.mail, argv.pass);
+		console.log('[INFO] Authentication success, your token:',token.slice(0,7)+'*'.repeat(33),'\n');
+		writeToken(token);
+	} catch (error) {
+		console.log(error, '\n');
+	}
+	process.exit(1);
+}
+
+async function funimationAuth(login, password) {
 	let authData;
-	try{
-		authData = await getData(api_host+'/auth/login/',false,true,false,true);
-		checkResp(authData);
-	}
-	catch(error){
-		console.log(error,'\n');
-		process.exit(1);
-	}
+	authData = await getData(api_host+'/auth/login/',false,true,false,true);
+	checkResp(authData);
 	authData = JSON.parse(authData);
-	if(authData.token){
-		console.log('[INFO] Authentication success, your token:',authData.token.slice(0,7)+'*'.repeat(33),'\n');
-		fs.writeFileSync(cfgFilename,JSON.stringify({"token":authData.token},null,'\t'));
-	}
-	else{
+
+	if (authData.token) {
+		return authData.token;
+	} else {
 		console.log('[ERROR]',authData.error,'\n');
-		process.exit(1);
+		throw 'AuthError';
 	}
+}
+
+function writeToken(token) {
+	fs.writeFileSync(cfgFilename,JSON.stringify({"token" : token}, null, '\t'));
 }
 
 async function searchShow(){
